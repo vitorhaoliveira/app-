@@ -9,21 +9,30 @@ export default function App() {
 
   useEffect(() => {
     fetch(urlAPI)
-      .then(response => response.json())
-      .then(data => {
-        setDataAPI(data) 
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
       })
-  }, [])
-
+      .then(data => {
+        console.log('Dados recebidos:', data); // Verifique a estrutura dos dados
+        setDataAPI(data.data || data); // Ajuste conforme a estrutura dos dados
+      })
+      .catch(error => {
+        console.error('Houve um problema com a requisição Fetch:', error);
+      });
+  }, []);
+  
   console.log(dataAPI)
 
   return (
     <View style={styles.container}>
       <Header />
       <Pokemon
-        name={dataAPI.text}
-        rarity={dataAPI.user.name.first}
-        images={dataAPI.images}
+        name={dataAPI.text || 'Texto não disponível'}
+        rarity={dataAPI.user?.name?.first || 'Nome não disponível'}
+        images={dataAPI.user?.photo || []}
       />
     </View>
   );
